@@ -609,7 +609,7 @@ of cores available on your system.
 
 **Inspect the generated code:**
 The generated code resides in the directory
-`Ref/fprime-build-automatic-native-ut/Ref/MathSender`.
+`Ref/fprime-build-automatic-native/Ref/MathSender`.
 You may wish to look over the file `MathSenderComponentAc.hpp`
 to get an idea of the interface to the auto-generated
 base class `MathSenderComponentBase`.
@@ -777,7 +777,13 @@ and run the unit tests.
 5. Run the command `fprime-util impl --ut`.
 It should generate files `Tester.cpp` and `Tester.hpp`.
 
-6. Move these files to the `test/ut` directory:
+6. Update the include statement for the MathSender component in `Tester.hpp`:
+
+```c++
+#include "Ref/MathSender/MathSender.hpp"
+```
+
+7. Move these files to the `test/ut` directory:
 
 ```bash
 mv Tester.* test/ut
@@ -1133,7 +1139,7 @@ and 10.
    This line tells the build system to make the unit test build
    depend on the `STest` build module.
 
-1. Add `#include STest/Random/Random.hpp` to `main.cpp`.
+1. Add `#include "STest/Random/Random.hpp"` to `main.cpp`.
 
 1. Add the following line to the `main` function of `main.cpp`,
    just before the return statement:
@@ -1145,7 +1151,7 @@ and 10.
    This line seeds the random number generator used by STest.
 
 **Running the tests:**
-Recompile and rerun the tests.
+Recompile and rerun the tests. `fprime-util check`
 Now go to
 `Ref/build-fprime-automatic-native-ut/Ref/MathSender` and inspect the
 file `seed-history`.
@@ -1849,7 +1855,9 @@ void Tester ::
     this->setFactor(factor, ThrottleState::THROTTLED);
 
     // send the command to clear the throttle
-    this->sendCmd_CLEAR_EVENT_THROTTLE(INSTANCE, CMD_SEQ);
+    const U32 instance = STest::Pick::any();
+    const U32 cmdSeq = STest::Pick::any();
+    this->sendCmd_CLEAR_EVENT_THROTTLE(instance, cmdSeq);
     // invoke scheduler port to dispatch message
     const U32 context = STest::Pick::any();
     this->invoke_to_schedIn(0, context);
@@ -1955,6 +1963,12 @@ Add unit tests covering the new behavior.
 The next step in the tutorial is to define instances of the
 `MathSender` and `MathReceiver` components and add them
 to the `Ref` topology.
+
+A reference implementation for this section is available at
+`docs/Tutorials/MathComponent/Top`.
+If at any point there is confusion, reference the files
+`instances.fpp` and `topology.fpp` from
+that directory.
 
 <a name="Updating-the-Ref-Deployment_Defining-the-Component-Instances"></a>
 ### 6.1. Defining the Component Instances
@@ -2163,15 +2177,6 @@ It should look similar to the
 You can use the menu to view other topology graphs.
 When you are done, close the browser window and
 type control-C in the console to shut down the FPV server.
-
-<a name="Updating-the-Ref-Deployment_Reference-Implementation"></a>
-### 6.5. Reference Implementation
-
-A reference implementation for this section is available at
-`docs/Tutorials/MathComponent/Top`.
-To build this implementation, copy the files
-`instances.fpp` and `topology.fpp` from
-that directory to `Ref/Top`.
 
 <a name="Running-the-Ref-Deployment"></a>
 ## 7. Running the Ref Deployment
